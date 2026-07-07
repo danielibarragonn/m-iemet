@@ -365,12 +365,24 @@ function semesterOf(row){
 }
 
 function baseSemester(data){
-  const rows = allRows(data).filter(r => r[3] > 0 && r[1] !== "PRACT" && r[1] !== "CAPS");
+  const rows = allRows(data).filter(r =>
+    r[3] > 0 &&
+    r[1] !== "PRACT" &&
+    r[1] !== "CAPS"
+  );
+
   const pending = rows.filter(r => !approved.has(r[1]));
-  if(pending.length === 0) return 10;
+
+  if(pending.length === 0){
+    const allSemesters = allRows(data)
+      .map(r => semesterOf(r))
+      .filter(s => s > 0);
+
+    return Math.max(...allSemesters);
+  }
+
   return Math.min(...pending.map(r => semesterOf(r)));
 }
-
 function isInProjectionWindow(row, data){
   const sem = semesterOf(row);
   const base = baseSemester(data);
