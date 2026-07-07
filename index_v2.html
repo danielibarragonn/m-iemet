@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Malla Interactiva DIMM UCN</title>
+<style>
+body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#0f172a;color:#e5e7eb}
+header{position:sticky;top:0;background:#111827;border-bottom:1px solid #334155;padding:16px;z-index:2}
+h1{margin:0;font-size:22px}.toolbar{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
+input{background:#020617;color:#e5e7eb;border:1px solid #334155;border-radius:10px;padding:10px 12px;min-width:260px}
+button{background:#020617;color:#e5e7eb;border:1px solid #334155;border-radius:10px;padding:10px 12px;cursor:pointer}
+button:hover{border-color:#93c5fd}
+.wrap{max-width:1400px;margin:auto}.grid{position:relative;display:grid;grid-template-columns:repeat(var(--cols),minmax(165px,1fr));gap:16px;padding:20px;overflow:auto}
+.col{display:flex;flex-direction:column;gap:12px}.col h3{font-size:14px;color:#94a3b8;margin:0}
+.card{background:#020617;border:1px solid #334155;border-radius:14px;padding:12px;box-shadow:0 8px 20px rgba(0,0,0,.25);cursor:pointer;transition:.15s}
+.card:hover{border-color:#93c5fd;transform:translateY(-1px)}
+.card.approved{opacity:.45;text-decoration:line-through;background:#111827}
+.card.locked{opacity:.35;border-style:dashed}
+.card.available{border-color:#22c55e}
+.code{font-weight:800;font-size:12px;color:#93c5fd}.name{font-size:14px;margin:5px 0 8px;line-height:1.25}
+.badge{display:inline-block;font-size:11px;border-radius:7px;padding:3px 7px;border:1px solid #334155;margin-right:5px;margin-top:4px}
+.legend{display:flex;gap:8px;flex-wrap:wrap}.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.pill{border:1px solid #334155;border-radius:999px;padding:7px 10px;background:#020617}
+.svg-layer{position:absolute;inset:0;pointer-events:none}footer{color:#94a3b8;padding:16px;font-size:12px}
+.progress{font-size:13px;color:#cbd5e1}
+.small{font-size:12px;color:#94a3b8}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>Malla Interactiva · DIMM UCN</h1>
+<div class="toolbar">
+<input id="q" type="search" placeholder="Buscar ramo o sigla…">
+<label class="pill"><input id="toggle-pr" type="checkbox" checked> Mostrar prerrequisitos</label>
+<label class="pill"><input id="toggle-lock" type="checkbox" checked> Resaltar pendientes/bloqueados</label>
+<button id="reset">Limpiar avance</button>
+<div class="progress" id="progress"></div>
+<div class="legend" id="legend"></div>
+</div>
+<div class="small">Haz clic sobre una asignatura para marcarla como aprobada/tachada. El avance queda guardado en este navegador.</div>
+</div></header>
+<main class="wrap"><div id="grid" class="grid" style="--cols:8"><svg id="wires" class="svg-layer"></svg></div></main>
+<footer class="wrap">Archivos esperados: <code>data_ICM.json</code> y <code>colors_ICM.json</code>.</footer>
+<script>
+const fallbackData={semesters:{s1:[["Cálculo I","CAL-I",1,6,"BAS",[],"A"],["Álgebra I","ALG-I",1,6,"BAS",[],"A"]],s2:[["Cálculo II","CAL-II",2,6,"BAS",["CAL-I"],"A"],["Álgebra II","ALG-II",2,6,"BAS",["ALG-I"],"A"]]},colors:{BAS:"#2E86C1",PRO:"#28B463",FG:"#AF7AC5",LAB:"#F5B041",ELE:"#7F8C8D"}};
+const STORAGE_KEY="malla-dimm-ucn-aprobadas-v1";
+let approved=new Set(JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"));
+let globalData=null;
+
+async function loadJSON(p){try{const r=await fetch(p,{cache:"no-store"});if(!r.ok)throw Error(r.status);return await r.json()}catch(e){return null}}
+async function getData(){const d=await loadJSON("./data_ICM.json");const c=await loadJSON("./colors_ICM.json");return d&&c?{semesters:d,colors:c}:fallbackData}
+
+function saveApproved(){localStorage.setItem(STORAGE_KEY,JSON.stringify([...approved]))}
+
+function buildLegend(colors){
+ const n={BAS:"Básica",PRO:"Profesional",FG:"Formación General",LAB:"Práctica/Lab",ELE:"Electivos"};
+ const el=document.getElementById("legend");el.innerHTML="";
+ Object.entries(colors).forEach(([k,v])=>{const s=document.createElement("span");s.className="badge";s.innerHTML=`<span class="sw" style="background:${v}"></span>${n[k]||k}`;el.appendChild(s)})
+}
+
+function allRows(data){
+ return Object.values(data.semesters).flat();
+}
+
+function isAvailable(row){
+ const pre=row[5]||[];
+ return pre.every(p=>approved.has(p));
+}
+
+function updateProgress(data){
+ const rows=allRows(data);
+ const totalSct=rows.reduce((a,r)=>a+(Number(r[3])||0),0);
+ const doneSct=rows.filter(r=>approved.has(r[1])).reduce((a,r)=>a+(Number(r[3])||0),0);
+ const doneN=rows.filter(r=>approved.has(r[1])).length;
+ document.getElementById("progress").textContent=`Avance: ${doneSct}/${totalSct} SCT · ${doneN}/${rows.length} asignaturas`;
+}
+
+function renderGrid(data){
+ globalData=data;
+ const grid=document.getElementById("grid"),wires=document.getElementById("wires"),q=document.getElementById("q"),show=document.getElementById("toggle-pr"),lock=document.getElementById("toggle-lock");
+ const sem=Object.keys(data.semesters).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+ grid.style.setProperty("--cols",sem.length||1);
+ grid.querySelectorAll(".col").forEach(n=>n.remove());
+
+ for(const sk of sem){
+  const col=document.createElement("div");
+  col.className="col";
+  col.innerHTML=`<h3>Semestre ${parseInt(sk.slice(1))}</h3>`;
+  for(const row of data.semesters[sk]){
+   const [nombre,sigla,nivel,sct,cat,pre]=row;
+   const card=document.createElement("div");
+   card.className="card";
+   card.dataset.sigla=sigla;
+   card.dataset.prerreq=(pre||[]).join(",");
+   card.title=(pre&&pre.length)?`Prerrequisitos: ${pre.join(", ")}`:"Sin prerrequisitos";
+   card.innerHTML=`<div class="code">${sigla}</div><div class="name">${nombre}</div><span class="badge">${sct} SCT</span><span class="badge" style="background:${(data.colors[cat]||"#334155")}33;border-color:${data.colors[cat]||"#334155"}">${cat}</span>`;
+   card.addEventListener("click",()=>{
+    if(approved.has(sigla)) approved.delete(sigla); else approved.add(sigla);
+    saveApproved(); refreshStates(); filter();
+   });
+   col.appendChild(card);
+  }
+  grid.appendChild(col);
+ }
+
+ function refreshStates(){
+  document.querySelectorAll(".card").forEach(card=>{
+   const sigla=card.dataset.sigla;
+   const row=allRows(data).find(r=>r[1]===sigla);
+   card.classList.toggle("approved",approved.has(sigla));
+   const available=row ? isAvailable(row) : true;
+   card.classList.toggle("available",!approved.has(sigla)&&available);
+   card.classList.toggle("locked",lock.checked&&!approved.has(sigla)&&!available);
+  });
+  updateProgress(data);
+  draw();
+ }
+
+ function draw(){
+  wires.innerHTML="";
+  if(!show.checked)return;
+  const gr=grid.getBoundingClientRect();
+  wires.setAttribute("width",gr.width);wires.setAttribute("height",gr.height);wires.setAttribute("viewBox",`0 0 ${gr.width} ${gr.height}`);
+  const pos=new Map();
+  document.querySelectorAll(".card").forEach(c=>{const r=c.getBoundingClientRect();pos.set(c.dataset.sigla,{x:r.left-gr.left,y:r.top-gr.top,w:r.width,h:r.height})});
+  for(const sk of sem){for(const row of data.semesters[sk]){
+   const [nombre,sigla,nivel,sct,cat,pre]=row,t=pos.get(sigla);if(!t||!pre)continue;
+   for(const p of pre){const s=pos.get(p);if(!s)continue;
+    const x1=s.x+s.w,y1=s.y+s.h/2,x2=t.x,y2=t.y+t.h/2,m=(x1+x2)/2;
+    const path=document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d",`M ${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`);
+    path.setAttribute("fill","none");path.setAttribute("stroke",data.colors[cat]||"#22d3ee");path.setAttribute("stroke-width","2");path.setAttribute("opacity",".65");wires.appendChild(path);
+   }
+  }}
+ }
+
+ function filter(){
+  const term=q.value.toLowerCase().trim();
+  document.querySelectorAll(".card").forEach(c=>{
+   const m=c.dataset.sigla.toLowerCase().includes(term)||c.querySelector(".name").textContent.toLowerCase().includes(term);
+   c.style.display=(!term||m)?"block":"none";
+  });
+  draw();
+ }
+ q.addEventListener("input",filter);
+ show.addEventListener("change",draw);
+ lock.addEventListener("change",refreshStates);
+ window.addEventListener("resize",draw);
+ document.getElementById("reset").addEventListener("click",()=>{approved.clear();saveApproved();refreshStates();filter()});
+ refreshStates();filter();
+}
+(async()=>{const d=await getData();buildLegend(d.colors);renderGrid(d)})();
+</script>
+</body></html>

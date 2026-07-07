@@ -1,0 +1,81 @@
+{
+  "s1": [
+    ["Cálculo I", "CAL-I", 1, 6, "BAS", []],
+    ["Introducción a la física", "FIS-I", 1, 6, "BAS", []],
+    ["Álgebra I", "ALG-I", 1, 6, "BAS", []],
+    ["Identidad, Universidad, Equidad y Género", "IdU", 1, 1, "FG", []],
+    ["Inglés I", "INGL-I", 1, 4, "FG", []],
+    ["Comunicación efectiva I", "COE-I", 1, 2, "FG", []],
+    ["Proyecto Introducción a la ingeniería", "PInt", 1, 5, "BAS", []]
+  ],
+  "s2": [
+    ["Cálculo II", "CAL-II", 2, 6, "BAS", ["CAL-I"]],
+    ["Mecánica", "FIS-II", 2, 6, "BAS", ["FIS-I"]],
+    ["Química general", "QUI", 2, 6, "BAS", []],
+    ["Álgebra II", "ALG-II", 2, 6, "BAS", ["ALG-I"]],
+    ["Diálogo, Fe-Cultura", "DFC-I", 2, 2, "FG", ["IdU"]],
+    ["Inglés II", "INGL-II", 2, 4, "FG", ["INGL-I"]]
+  ],
+  "s3": [
+    ["Ecuaciones diferenciales", "ECD", 3, 5, "BAS", ["CAL-II", "ALG-II"]],
+    ["Cálculo III", "CAL-III", 3, 5, "BAS", ["CAL-II"]],
+    ["Termodinámica", "TER", 3, 5, "BAS", ["QUI", "CAL-II"]],
+    ["Geología y Mineralogía", "GYM", 3, 5, "BAS", ["QUI"]],
+    ["Diálogo, Fe-Ciencia", "DFC-II", 3, 2, "FG", ["DFC-I"]],
+    ["Formación general electiva", "FGE", 3, 2, "FG", []],
+    ["Proyecto diseño e innovación", "PDI", 3, 6, "BAS", ["PInt"]]
+  ],
+  "s4": [
+    ["Estadística", "EST", 4, 6, "BAS", ["CAL-II"]],
+    ["Electromagnetismo", "ELM", 4, 6, "BAS", ["FIS-II", "CAL-III", "ALG-I"]],
+    ["Termodinámica aplicada", "TER-AP", 4, 5, "PRO", ["TER"]],
+    ["Operaciones mecánicas", "OPMEC", 4, 5, "PRO", ["GYM"]],
+    ["Ética y moral profesional", "ETP", 4, 2, "FG", ["DFC-II"]],
+    ["Proyecto Intro a la Ing. Metalúrgica", "PIMET", 4, 6, "PRO", ["PDI"]]
+  ],
+  "s5": [
+    ["Ingeniería y desarrollo sustentable", "SUST", 5, 5, "PRO", []],
+    ["Programación", "PRG", 5, 5, "BAS", ["ALG-II", "PIMET"]],
+    ["Operaciones Mineras", "OPMIN", 5, 5, "PRO", ["GYM"]],
+    ["Procesamiento de minerales", "PMIN", 5, 5, "PRO", ["OPMEC"]],
+    ["Cinética metalúrgica", "CINMET", 5, 5, "PRO", ["ECD", "TER-AP"]],
+    ["Métodos numéricos", "MNUM", 5, 5, "BAS", ["ECD"]]
+  ],
+  "s6": [
+    ["Mecánica de fluidos", "MFL", 6, 5, "PRO", ["ALG-I", "ECD"]],
+    ["Ingeniería económica", "INGECO", 6, 5, "PRO", ["CAL-II"]],
+    ["Transferencia de masa y calor", "TMC", 6, 5, "PRO", ["CINMET"]],
+    ["Disolución de sistemas acuosos", "DSA", 6, 5, "PRO", ["CINMET"]],
+    ["Electivo profesional I", "EP-I", 6, 5, "ELE", []],
+    ["Proyecto procesamiento de minerales", "PPMIN", 6, 5, "PRO", ["PIMET", "PMIN"]],
+    ["Práctica Profesional", "PRACT", 6, 0, "LAB", ["CAL-I", "FIS-I", "ALG-I", "IdU", "INGL-I", "COE-I", "PInt", "CAL-II", "FIS-II", "QUI", "ALG-II", "DFC-I", "INGL-II", "ECD", "CAL-III", "TER", "GYM", "DFC-II", "FGE", "PDI", "EST", "ELM", "TER-AP", "OPMEC", "ETP", "PIMET", "SUST", "PRG", "OPMIN", "PMIN", "CINMET", "MNUM", "MFL", "INGECO", "TMC", "DSA", "EP-I", "PPMIN"]]
+  ],
+  "s7": [
+    ["Electrotecnia", "ELETEC", 7, 5, "PRO", ["ECD", "ELM"]],
+    ["Separación sólido-líquido", "SSL", 7, 5, "PRO", ["MFL"]],
+    ["Proceso de fusión", "PFUS", 7, 5, "PRO", ["TMC"]],
+    ["Tratamiento de soluciones y electrometalurgia", "TSE", 7, 5, "PRO", ["CINMET"]],
+    ["Electivo profesional II", "EP-II", 7, 5, "ELE", []],
+    ["Proyecto hidrometalúrgico", "PHM", 7, 5, "PRO", ["CINMET", "DSA"]]
+  ],
+  "s8": [
+    ["Materiales y sus propiedades", "MATPROP", 8, 5, "PRO", []],
+    ["Refinación alta temperatura", "RAT", 8, 5, "PRO", ["TMC"]],
+    ["Seguridad y legislación laboral", "SLL", 8, 5, "PRO", ["TMC"]],
+    ["Emprendimiento", "EMP", 8, 3, "PRO", []],
+    ["Electivo profesional III", "EP-III", 8, 5, "ELE", []],
+    ["Comunicación efectiva II", "COE-II", 8, 2, "FG", ["COE-I"]],
+    ["Proyecto Nuevas tecnologías en metalurgia extractiva", "PNTME", 8, 5, "PRO", ["PHM"]]
+  ],
+  "s9": [
+    ["Control de procesos", "CPROC", 9, 5, "PRO", ["DSA"]],
+    ["Electivo profesional IV", "EP-IV", 9, 5, "ELE", []],
+    ["Electivo profesional V", "EP-V", 9, 5, "ELE", []],
+    ["Electivo profesional VI", "EP-VI", 9, 5, "ELE", []],
+    ["Electivo profesional VII", "EP-VII", 9, 5, "ELE", []],
+    ["Electivo profesional VIII", "EP-VIII", 9, 5, "ELE", []]
+  ],
+  "s10": [
+    ["Actividad de titulación", "CAPS", 10, 30, "PRO", ["CAL-I", "FIS-I", "ALG-I", "IdU", "INGL-I", "COE-I", "PInt", "CAL-II", "FIS-II", "QUI", "ALG-II", "DFC-I", "INGL-II", "ECD", "CAL-III", "TER", "GYM", "DFC-II", "FGE", "PDI", "EST", "ELM", "TER-AP", "OPMEC", "ETP", "PIMET", "SUST", "PRG", "OPMIN", "PMIN", "CINMET", "MNUM", "MFL", "INGECO", "TMC", "DSA", "EP-I", "PPMIN", "PRACT", "ELETEC", "SSL", "PFUS", "TSE", "EP-II", "PHM", "MATPROP", "RAT", "SLL", "EMP", "EP-III", "COE-II", "PNTME", "CPROC", "EP-IV", "EP-V", "EP-VI", "EP-VII", "EP-VIII"]]
+  ]
+}

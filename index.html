@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Malla Interactiva ICM - DIMM UCN</title>
+<style>
+body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#0f172a;color:#e5e7eb}
+
+header{
+  position:sticky;
+  top:0;
+  background:#020817;
+  color:#e5e7eb;
+  border-bottom:1px solid #334155;
+  padding:16px;
+  z-index:2;
+}
+h1{margin:0;font-size:22px; text-transform:uppercase}.toolbar{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+input{background:#ffffff;color:#111827;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;min-width:240px}
+button{background:#ffffff;color:#111827;border:1px solid #cbd5e1;border-radius:10px;padding:8px 10px;cursor:pointer}
+button:hover{border-color:#93c5fd}
+.wrap{max-width:1500px;margin:auto}.grid{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(var(--cols),minmax(165px,1fr));
+  gap:16px;
+  padding:0 20px 20px 20px;
+  overflow:visible;
+}
+.scroll-area{
+  overflow:auto;
+  background:#0f172a;
+}
+.col{display:flex;flex-direction:column;gap:12px}.col h3{font-size:14px;color:#94a3b8;margin:0}.sem-actions{
+  display:flex;
+  width:100%;
+}
+
+.sem-toggle{
+  width:100%;
+}
+.sem-toggle.active{
+  background:#111827;
+  color:#ffffff;
+  border-color:#111827;
+}
+.year-toggle.active{
+  background:#111827;
+  color:#ffffff;
+  border-color:#111827;
+}
+.simulation-info{
+  margin-top:6px;
+  font-size:14px;
+  font-weight:700;
+  color:#1d4ed8;
+}
+.category-dashboard{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  margin-top:6px;
+  font-size:12px;
+  color:#111827;
+}
+
+.category-card{
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:6px 8px;
+  background:#ffffff;
+  min-width:150px;
+}
+
+.category-title{
+  font-weight:700;
+  margin-bottom:4px;
+}
+
+.category-bar{
+    height:10px;
+    background:#e5e7eb;
+    border-radius:6px;
+    overflow:hidden;
+    margin:8px 0;
+}
+
+.category-fill{
+  height:100%;
+  background:#22c55e;
+  border-radius:999px;
+}
+
+.category-detail{
+  margin-top:4px;
+  font-size:11px;
+  color:#475569;
+}  
+.detail-btn{
+  display:block;
+  margin-top:8px;
+  padding:4px 7px;
+  font-size:11px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+body:not(.light-mode) .detail-btn{
+  background:#1e293b;
+  color:#e5e7eb;
+  border:1px solid #334155;
+}
+
+body.light-mode .detail-btn{
+  background:#f8fafc;
+  color:#111827;
+  border:1px solid #cbd5e1;
+}  
+.card{background:#ffffff;color:#111827;border:1px solid #cbd5e1;border-radius:14px;padding:12px;box-shadow:0 8px 20px rgba(0,0,0,.25);cursor:pointer;transition:.15s}
+.card:hover{border-color:#93c5fd;transform:translateY(-1px)}
+.card.approved{opacity:.45;text-decoration:line-through;background:#e5e7eb; color:#111827}
+.card.locked{opacity:.35;border-style:dashed}
+.card.available{border-color:#22c55e}
+.card.simulated{
+  border:3px solid #f59e0b;
+  background:#fff7ed;
+}
+.prereq-line{
+  opacity:.35;
+  transition:.2s;
+}
+
+.prereq-line.active{
+  stroke:#fbbf24 !important;
+  stroke-width:5 !important;
+  opacity:1 !important;
+}
+
+.prereq-line.inactive{
+  opacity:.08 !important;
+}  
+.card.hover-source{
+    transform:scale(1.03);
+    box-shadow:0 0 16px rgba(255,255,255,.8);
+    z-index:2;
+}
+
+.card.prereq-ok{
+    border:3px solid #22c55e;
+    box-shadow:0 0 8px rgba(34,197,94,.5);
+}
+
+.card.prereq-missing{
+    border:3px solid #ef4444;
+    box-shadow:0 0 8px rgba(239,68,68,.5);
+}
+.card.newly-available{
+    background:white;
+    border:3px solid #2563eb;
+    box-shadow:0 0 8px rgba(37,99,235,.4);
+}
+.code{font-weight:800;font-size:12px;color:#1d4ed8}.name{font-size:14px;margin:5px 0 8px;line-height:1.25}
+.badge{display:inline-block;font-size:11px;border-radius:7px;padding:3px 7px;border:1px solid #334155;margin-right:5px;margin-top:4px}
+.legend{display:flex;gap:8px;flex-wrap:wrap}.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.status-legend{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  align-items:center;
+  font-size:13px;
+  color:#e5e7eb;
+  margin-top:6px;
+  font-weight:600;
+}
+
+body.light-mode .status-legend{
+  color:#111827;
+}
+
+.status-legend span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.status-box{
+  width:22px;
+  height:14px;
+  border-radius:4px;
+  display:inline-block;
+  border:2px solid #334155;
+}
+
+.status-available{
+  background:#ffffff;
+  border:3px solid #22c55e;
+}
+
+.status-approved{
+  background:#e5e7eb;
+  border:3px solid #6b7280;
+  position:relative;
+}
+
+.status-approved::after{
+  content:"";
+  position:absolute;
+  left:2px;
+  right:2px;
+  top:6px;
+  height:2px;
+  background:#111827;
+  transform:rotate(-12deg);
+}
+
+.status-locked{
+  background:#6b7280;
+  border:2px dashed #111827;
+}
+.pill{
+  border:1px solid #cbd5e1;
+  border-radius:999px;
+  padding:7px 10px;
+  background:#ffffff;
+  color:#111827;
+}
+.svg-layer{position:absolute;inset:0;pointer-events:none}footer{color:#94a3b8;padding:16px;font-size:12px}
+.progress{
+  font-size:18px;
+  font-weight:700;
+  color:#e5e7eb;
+}
+
+.small{
+  font-size:12px;
+  color:#cbd5e1;
+}
+
+.yearbar{
+  display:grid;
+  gap:16px;
+  padding:14px 20px 10px 20px;
+  background:#0f172a;
+  min-width:max-content;
+}
+
+body.light-mode .progress{
+  color:#111827;
+}
+
+body.light-mode .small{
+  color:#475569;
+}
+
+body.light-mode header{
+  background:#ffffff;
+  color:#111827;
+  border-bottom:1px solid #cbd5e1;
+}
+
+body.light-mode .scroll-area{
+  background:#f1f5f9;
+}
+
+body.light-mode .yearbar{
+  background:#f1f5f9;
+}
+
+body.light-mode .card{
+  background:#f1f5f9;
+  color:#111827;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+
+body.light-mode .card.locked{
+  background:#e5e7eb;
+  color:#111827;
+}
+
+body.light-mode footer{
+  color:#475569;
+} 
+body:not(.light-mode) button,
+body:not(.light-mode) .pill{
+  background:#111827;
+  color:#e5e7eb;
+  border-color:#334155;
+}
+
+body:not(.light-mode) button:hover{
+  background:#334155;
+}
+
+body:not(.light-mode) input{
+  background:#111827;
+  color:#e5e7eb;
+  border-color:#334155;
+}
+
+body:not(.light-mode) input::placeholder{
+  color:#94a3b8;
+}
+
+body:not(.light-mode) .year-toggle,
+body:not(.light-mode) .sem-toggle{
+  background:#e2e8f0;
+  color:#111827;
+}
+
+body.light-mode .card.available{
+  background:#ffffff;
+  border-color:#22c55e;
+  opacity:1;
+}  
+body.light-mode{
+  background:#4a2418;
+}    
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div style="display:flex;align-items:center;gap:12px;">
+  <img src="logo_ucn.png" alt="Logo UCN" style="height:48px;">
+  <h1>Malla Interactiva Ing. Civil Metalúrgica · DIMM UCN</h1>
+</div>
+<div class="toolbar">
+<input id="q" type="search" placeholder="Buscar ramo o sigla…">
+<label class="pill"><input id="toggle-pr" type="checkbox"> Mostrar prerrequisitos</label>
+<label class="pill"><input id="toggle-lock" type="checkbox" checked> Resaltar pendientes/bloqueados</label>
+<label class="pill"><input id="only-available" type="checkbox"> Solo disponibles</label>
+<button id="reset">Limpiar avance</button>
+<button id="export">Exportar avance</button>
+<button id="theme-toggle">Modo claro</button>  
+<div class="progress" id="progress"></div>
+<div class="category-dashboard" id="category-dashboard"></div> 
+<div class="legend" id="legend"></div>
+<div class="status-legend">
+  <span><span class="status-box status-available"></span> Disponible / proyectable</span>
+  <span><span class="status-box status-approved"></span> Aprobado</span>
+  <span><span class="status-box status-locked"></span> Bloqueado</span>
+</div>
+</div>
+<div class="small">Haz clic en un ramo para aprobarlo/tacharlo. Usa Shift + clic para simular qué ramos se habilitan. También puedes aprobar semestres o años completos.</div>
+<div id="simulation-info" class="simulation-info"></div>
+</div></header>
+<main class="wrap">
+  <div class="scroll-area">
+    <div class="yearbar" id="yearbar"></div>
+    <div id="grid" class="grid" style="--cols:8"><svg id="wires" class="svg-layer"></svg></div>
+  </div>
+</main>
+<footer class="wrap">Archivos esperados: <code>data_ICM.json</code> y <code>colors_ICM.json</code>.</footer>
+<script>
+const fallbackData={semesters:{s1:[["Cálculo I","CAL-I",1,6,"BAS",[],"A"],["Álgebra I","ALG-I",1,6,"BAS",[],"A"]],s2:[["Cálculo II","CAL-II",2,6,"BAS",["CAL-I"],"A"],["Álgebra II","ALG-II",2,6,"BAS",["ALG-I"],"A"]]},colors:{BAS:"#2E86C1",PRO:"#28B463",FG:"#AF7AC5",LAB:"#F5B041",ELE:"#7F8C8D"}};
+const STORAGE_KEY="malla-dimm-ucn-aprobadas-v2";
+let approved=new Set(JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"));
+let globalData=null;
+async function loadJSON(p){try{const r=await fetch(p,{cache:"no-store"});if(!r.ok)throw Error(r.status);return await r.json()}catch(e){return null}}
+async function getData(){const d=await loadJSON("./data_ICM.json");const c=await loadJSON("./colors_ICM.json");return d&&c?{semesters:d,colors:c}:fallbackData}
+function saveApproved(){localStorage.setItem(STORAGE_KEY,JSON.stringify([...approved]))}
+function allRows(data){return Object.values(data.semesters).flat()}
+function isAvailable(row){return (row[5]||[]).every(p=>approved.has(p))}
+function semesterOf(row){
+  return Number(row[2]) || 0;
+}
+
+function baseSemester(data){
+  const rows = allRows(data).filter(r => r[3] > 0 && r[1] !== "PRACT" && r[1] !== "CAPS");
+  const pending = rows.filter(r => !approved.has(r[1]));
+  if(pending.length === 0) return 10;
+  return Math.min(...pending.map(r => semesterOf(r)));
+}
+
+function isInProjectionWindow(row, data){
+  const sem = semesterOf(row);
+  const base = baseSemester(data);
+  return sem >= base && sem <= base + 2;
+}
+
+function basicCycleComplete(data){
+  const basicRows = allRows(data).filter(r =>
+    semesterOf(r) <= 4 &&
+    r[3] > 0 &&
+    r[1] !== "PRACT" &&
+    r[1] !== "CAPS"
+  );
+  return basicRows.every(r => approved.has(r[1]));
+}
+
+function isProfessional(row){
+  return semesterOf(row) >= 5;
+}
+
+function isProjected(row, data){
+  const sigla = row[1];
+
+  // Práctica Profesional: no se evalúa por dispersión,
+  // solo por sus requisitos/nivel definido en el JSON.
+  if(sigla === "PRACT"){
+    return isAvailable(row);
+  }
+
+  const prereqOk = isAvailable(row);
+  const windowOk = isInProjectionWindow(row, data);
+  const cycleOk = !isProfessional(row) || basicCycleComplete(data);
+
+  return prereqOk && windowOk && cycleOk;
+}
+function unlocksCourses(sigla,data){
+  const unlocked=[];
+
+  for(const sem of Object.keys(data.semesters)){
+    for(const row of data.semesters[sem]){
+      const prereq=row[5]||[];
+
+      if(prereq.includes(sigla)){
+        unlocked.push(`${row[1]} - ${row[0]}`);
+      }
+    }
+  }
+
+  return unlocked.sort();
+}  
+function statusReason(row,data){
+  const nombre = row[0];
+  const sigla = row[1];
+  const semestre = row[2];
+  const sct = row[3];
+  const categoria = row[4];
+  const prereq = row[5] || [];
+
+  const prereqLines = prereq.length
+    ? prereq.map(p => `${approved.has(p) ? "✔" : "✖"} ${p}`).join("\n")
+    : "Sin prerrequisitos";
+
+  const unlocked = unlocksCourses(sigla,data);
+  const unlockedText = unlocked.length
+    ? unlocked.join("\n")
+    : "Ninguna";
+
+  const impactText = unlockImpactText(sigla,data);
+
+  if(approved.has(sigla)){
+    return `${nombre}
+
+Estado: ✔ Aprobada
+
+Sigla: ${sigla}
+Semestre: ${semestre}
+Créditos: ${sct} SCT
+Categoría: ${categoria}
+
+Prerrequisitos:
+${prereqLines}
+
+Desbloquea:
+${unlockedText}
+
+${impactText}`;
+  }
+
+  if(isProjected(row,data)){
+    return `${nombre}
+
+Estado: ✔ Disponible para inscripción
+
+Sigla: ${sigla}
+Semestre: ${semestre}
+Créditos: ${sct} SCT
+Categoría: ${categoria}
+
+Prerrequisitos:
+${prereqLines}
+
+Desbloquea:
+${unlockedText}
+
+${impactText}`;
+  }
+
+  const missing = prereq.filter(p => !approved.has(p));
+
+  let motivos = [];
+
+  if(missing.length > 0){
+    motivos.push("Faltan prerrequisitos: " + missing.join(", "));
+  }
+
+  if(sigla !== "PRACT" && !isInProjectionWindow(row,data)){
+    const base = baseSemester(data);
+    motivos.push(`Fuera de proyección académica. Proyección actual: ${base}-${base+2}`);
+  }
+
+  if(isProfessional(row) && !basicCycleComplete(data)){
+    motivos.push("Debe completar el ciclo básico para acceder al ciclo profesional");
+  }
+
+  if(motivos.length === 0){
+    motivos.push("No cumple las condiciones de proyección");
+  }
+
+  return `${nombre}
+
+Estado: ✖ No disponible
+
+Sigla: ${sigla}
+Semestre: ${semestre}
+Créditos: ${sct} SCT
+Categoría: ${categoria}
+
+Motivo:
+- ${motivos.join("\n- ")}
+
+Prerrequisitos:
+${prereqLines}
+
+Desbloquea:
+${unlockedText}
+
+${impactText}`;
+}
+function unlockImpact(sigla,data){
+  const direct = unlocksCourses(sigla,data);
+
+  const directRows = direct
+    .map(item => item.split(" - ")[0])
+    .map(code => allRows(data).find(r => r[1] === code))
+    .filter(Boolean);
+
+  const totalSct = directRows.reduce((sum,r)=>sum + (Number(r[3]) || 0), 0);
+  const count = directRows.length;
+
+  let level = "Bajo";
+
+  if(count >= 5){
+    level = "Alto";
+  }else if(count >= 3){
+    level = "Medio";
+  }
+
+  return {
+    count,
+    totalSct,
+    level
+  };
+}
+
+function unlockImpactText(sigla,data){
+  const impact = unlockImpact(sigla,data);
+
+  return `Impacto en desbloqueo: ${impact.level}
+Asignaturas que abre directamente: ${impact.count}
+SCT asociados a esas asignaturas: ${impact.totalSct}
+
+Nota: este indicador solo señala cuántas asignaturas posteriores se habilitan directamente; no implica mayor importancia académica respecto de otros ramos.`;
+}  
+function projectionText(data){
+  const base = baseSemester(data);
+  const max = base + 2;
+  const cycle = basicCycleComplete(data) ? "Ciclo profesional habilitado" : "Ciclo profesional bloqueado";
+  return `Semestre base: ${base} · Proyección: ${base}-${max} · ${cycle}`;
+}
+function updateCategoryDashboard(data){
+  const names = {
+    BAS: "Básica",
+    PRO: "Profesional",
+    FG: "Formación General",
+    LAB: "Práctica/Lab",
+    ELE: "Electivos"
+  };
+
+  const rows = allRows(data).filter(r => Number(r[3]) > 0);
+  const cats = [...new Set(rows.map(r => r[4]))];
+
+  const html = cats.map(cat=>{
+    const catRows = rows.filter(r => r[4] === cat);
+    const approvedRows = catRows.filter(r => approved.has(r[1]));
+
+    const totalSct = catRows.reduce((a,r)=>a+(Number(r[3])||0),0);
+    const doneSct = approvedRows.reduce((a,r)=>a+(Number(r[3])||0),0);
+
+    const pct = totalSct ? ((doneSct/totalSct)*100).toFixed(0) : 0;
+    const color = (globalData.colors && globalData.colors[cat]) ? globalData.colors[cat] : "#22c55e";
+    let estado = "⚪ Sin iniciar";
+
+    if(Number(pct) === 100){
+    estado = "✔ Completada";
+    }else if(Number(pct) > 0){
+      estado = "🟡 En progreso";
+}
+
+    return `
+      <div class="category-card">
+        <div class="category-title">${names[cat] || cat}</div>
+        <div class="category-bar">
+          <div class="category-fill" style="width:${pct}%;background:${color};"></div>
+        </div>
+        <div class="category-detail">
+            ${doneSct}/${totalSct} SCT · ${approvedRows.length}/${catRows.length} ramos · ${pct}%<br>
+            ${estado}
+      </div>
+      </div>
+    `;
+  }).join("");
+
+  document.getElementById("category-dashboard").innerHTML = html;
+}  
+function updateProgress(data){
+  const rows = allRows(data);
+
+  const totalSct = rows.reduce((a,r)=>a+(Number(r[3])||0),0);
+
+  const doneRows = rows.filter(r=>approved.has(r[1]));
+  const doneSct = doneRows.reduce((a,r)=>a+(Number(r[3])||0),0);
+
+  const pctSct = totalSct ? ((doneSct/totalSct)*100).toFixed(1) : 0;
+  const pctRamos = rows.length ? ((doneRows.length/rows.length)*100).toFixed(1) : 0;
+
+  document.getElementById("progress").textContent =
+    `Créditos aprobados: ${doneSct}/${totalSct} SCT (${pctSct}%) · Ramos: ${doneRows.length}/${rows.length} (${pctRamos}%) · ${projectionText(data)}`;
+
+  updateCategoryDashboard(data);
+}
+  
+function buildLegend(colors){
+ const n={BAS:"Básica",PRO:"Profesional",FG:"Formación General",LAB:"Práctica/Lab",ELE:"Electivos"};
+ const el=document.getElementById("legend");el.innerHTML="";
+ Object.entries(colors).forEach(([k,v])=>{const s=document.createElement("span");s.className="badge";s.innerHTML=`<span class="sw" style="background:${v}"></span>${n[k]||k}`;el.appendChild(s)})
+}
+function approveSemester(sk){(globalData.semesters[sk]||[]).forEach(r=>approved.add(r[1]));saveApproved();renderGrid(globalData)}
+function unapproveSemester(sk){(globalData.semesters[sk]||[]).forEach(r=>approved.delete(r[1]));saveApproved();renderGrid(globalData)}
+function approveYear(y){
+ const s1="s"+(y*2-1), s2="s"+(y*2);
+ [s1,s2].forEach(sk=>(globalData.semesters[sk]||[]).forEach(r=>approved.add(r[1])));
+ saveApproved();renderGrid(globalData)
+}
+function buildYearButtons(data){
+ const yb=document.getElementById("yearbar");
+ yb.innerHTML = "";
+
+ const sems = Object.keys(data.semesters)
+   .map(s => parseInt(s.slice(1)))
+   .filter(n => !isNaN(n));
+
+ const maxSem = Math.max(...sems);
+ const maxYear = Math.ceil(maxSem / 2);
+
+ yb.style.display = "grid";
+ yb.style.gridTemplateColumns = `repeat(${maxSem}, minmax(165px, 1fr))`;
+ yb.style.gap = "16px";
+
+ for(let y = 1; y <= maxYear; y++){
+   const b = document.createElement("button");
+   b.className = "year-toggle";
+   b.textContent = `Año ${y}`;
+
+   b.style.gridColumn = `${(y * 2) - 1} / span 2`;
+   b.style.width = "100%";
+
+   const s1 = "s" + (y * 2 - 1);
+   const s2 = "s" + (y * 2);
+
+   const ramosAnio = [
+     ...(globalData.semesters[s1] || []),
+     ...(globalData.semesters[s2] || [])
+   ];
+
+   const completoAnio = ramosAnio.length > 0 && ramosAnio.every(r => approved.has(r[1]));
+
+   if (completoAnio) {
+     b.classList.add("active");
+   }
+
+   b.onclick = () => {
+     const completo = ramosAnio.every(r => approved.has(r[1]));
+
+     if(completo){
+       ramosAnio.forEach(r => approved.delete(r[1]));
+     }else{
+       ramosAnio.forEach(r => approved.add(r[1]));
+     }
+
+     saveApproved();
+     renderGrid(globalData);
+   };
+
+   yb.appendChild(b);
+ }
+}
+function simulateApproval(sigla,data){
+  document.querySelectorAll(".card").forEach(c=>{
+    c.classList.remove("simulated","newly-available");
+  });
+
+  const tempApproved = new Set(approved);
+  tempApproved.add(sigla);
+
+  function tempIsAvailable(row){
+    return (row[5]||[]).every(p=>tempApproved.has(p));
+  }
+
+  function tempBaseSemester(){
+    const rows = allRows(data).filter(r => r[3] > 0 && r[1] !== "PRACT" && r[1] !== "CAPS");
+    const pending = rows.filter(r => !tempApproved.has(r[1]));
+    if(pending.length === 0) return 10;
+    return Math.min(...pending.map(r => semesterOf(r)));
+  }
+
+  function tempBasicCycleComplete(){
+    const basicRows = allRows(data).filter(r =>
+      semesterOf(r) <= 4 &&
+      r[3] > 0 &&
+      r[1] !== "PRACT" &&
+      r[1] !== "CAPS"
+    );
+    return basicRows.every(r => tempApproved.has(r[1]));
+  }
+
+  function tempIsProjected(row){
+    const sig = row[1];
+
+    if(sig === "PRACT"){
+      return tempIsAvailable(row);
+    }
+
+    const base = tempBaseSemester();
+    const sem = semesterOf(row);
+
+    const prereqOk = tempIsAvailable(row);
+    const windowOk = sem >= base && sem <= base + 2;
+    const cycleOk = !isProfessional(row) || tempBasicCycleComplete();
+
+    return prereqOk && windowOk && cycleOk;
+  }
+
+  document.querySelectorAll(".card").forEach(card=>{
+    const cardSigla = card.dataset.sigla;
+    const row = allRows(data).find(r=>r[1]===cardSigla);
+
+    if(!row || approved.has(cardSigla)) return;
+
+    if(cardSigla === sigla){
+      card.classList.add("simulated");
+      return;
+    }
+
+    const availableNow = isProjected(row,data);
+    const availableWithSimulation = tempIsProjected(row);
+
+    if(!availableNow && availableWithSimulation){
+      card.classList.add("newly-available");
+    }
+    const simulatedRow = allRows(data).find(r=>r[1]===sigla);
+    const simulatedName = simulatedRow ? simulatedRow[0] : sigla;
+
+    const newlyAvailable = [...document.querySelectorAll(".card.newly-available")]
+      .map(c => c.dataset.sigla);
+
+    const info = document.getElementById("simulation-info");
+
+    if(newlyAvailable.length > 0){
+      info.textContent = `Simulación: si apruebas ${simulatedName}, se habilitarían ${newlyAvailable.length} asignatura(s): ${newlyAvailable.join(", ")}.`;
+    }else{
+      info.textContent = `Simulación: si apruebas ${simulatedName}, no se habilitarían nuevas asignaturas.`;
+}
+  });
+} 
+function highlightPrereqs(sigla,data){
+
+    document.querySelectorAll(".card").forEach(c=>{
+        c.classList.remove(
+            "hover-source",
+            "prereq-ok",
+            "prereq-missing"
+        );
+    });
+
+    const row = allRows(data).find(r=>r[1]===sigla);
+
+    if(!row) return;
+
+    document.querySelector(`.card[data-sigla="${sigla}"]`)
+        ?.classList.add("hover-source");
+
+    (row[5]||[]).forEach(pre=>{
+
+        const card=document.querySelector(`.card[data-sigla="${pre}"]`);
+
+        if(!card) return;
+
+        if(approved.has(pre))
+            card.classList.add("prereq-ok");
+        else
+            card.classList.add("prereq-missing");
+
+    });
+
+}  
+function clearHighlight(){
+
+    document.querySelectorAll(".card").forEach(c=>{
+
+        c.classList.remove(
+            "hover-source",
+            "prereq-ok",
+            "prereq-missing"
+        );
+
+    });
+
+}  
+function highlightPrereqLines(sigla){
+  document.querySelectorAll(".prereq-line").forEach(line=>{
+    const related = line.dataset.from === sigla || line.dataset.to === sigla;
+
+    line.classList.toggle("active", related);
+    line.classList.toggle("inactive", !related);
+  });
+}
+
+function clearPrereqLines(){
+  document.querySelectorAll(".prereq-line").forEach(line=>{
+    line.classList.remove("active","inactive");
+  });
+}  
+function renderGrid(data){
+ globalData=data; buildYearButtons(data);
+ const grid=document.getElementById("grid"),wires=document.getElementById("wires"),q=document.getElementById("q"),show=document.getElementById("toggle-pr"),lock=document.getElementById("toggle-lock"),onlyAvailable=document.getElementById("only-available");
+ const sem=Object.keys(data.semesters).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+ grid.style.setProperty("--cols",sem.length||1);
+ grid.querySelectorAll(".col").forEach(n=>n.remove());
+ for(const sk of sem){
+  const col=document.createElement("div"); col.className="col";
+col.innerHTML=`<div class="sem-actions"><button class="sem-toggle">Semestre ${parseInt(sk.slice(1))}</button></div>`;
+
+const semBtn = col.querySelector(".sem-toggle");
+const ramosSemestre = globalData.semesters[sk] || [];
+const completoSemestre = ramosSemestre.every(r => approved.has(r[1]));
+
+if (completoSemestre) {
+  semBtn.classList.add("active");
+}
+
+semBtn.onclick = () => {
+  const completo = ramosSemestre.every(r => approved.has(r[1]));
+
+  if (completo) {
+    ramosSemestre.forEach(r => approved.delete(r[1]));
+  } else {
+    ramosSemestre.forEach(r => approved.add(r[1]));
+  }
+
+  saveApproved();
+  renderGrid(globalData);
+};
+  for(const row of data.semesters[sk]){
+   const [nombre,sigla,nivel,sct,cat,pre]=row;
+   const card=document.createElement("div"); 
+   card.className="card"; 
+   card.dataset.sigla=sigla; 
+   //card.title=statusReason(row,data);
+   card.innerHTML=`
+    <div class="code">${sigla}</div>
+    <div class="name">${nombre}</div>
+    <span class="badge">${sct} SCT</span>
+    <span class="badge" style="background:${(data.colors[cat]||"#334155")}33;border-color:${data.colors[cat]||"#334155"}">${cat}</span>
+    <button class="detail-btn">ℹ Detalle</button>
+`;
+   card.querySelector(".detail-btn").addEventListener("click",(e)=>{
+      e.stopPropagation();
+      alert(statusReason(row,data));
+}); 
+   card.addEventListener("click",(e)=>{
+      if(e.shiftKey){
+        simulateApproval(sigla,data);
+          return;
+        }
+
+      document.getElementById("simulation-info").textContent = "";
+
+      approved.has(sigla)?approved.delete(sigla):approved.add(sigla);
+      saveApproved();
+      refreshStates();
+      filter();
+});
+
+card.addEventListener("mouseenter",()=>{
+  highlightPrereqs(sigla,data);
+  highlightPrereqLines(sigla);
+});
+
+card.addEventListener("mouseleave",()=>{
+  clearHighlight();
+  clearPrereqLines();
+});
+
+col.appendChild(card);
+  }
+  grid.appendChild(col);
+ }
+ function refreshStates(){
+  document.querySelectorAll(".card").forEach(card=>{
+   const sigla=card.dataset.sigla;
+   const row=allRows(data).find(r=>r[1]===sigla);
+
+   const available=row?isAvailable(row):true;
+   const projected=row?isProjected(row,data):true;
+
+   card.classList.toggle("approved",approved.has(sigla));
+   card.classList.toggle("available",!approved.has(sigla)&&projected);
+   card.classList.toggle("locked",lock.checked&&!approved.has(sigla)&&!projected);
+   if(row){
+   //card.title = statusReason(row,data);
+}
+  });
+  updateProgress(data);draw();
+ }
+function draw(){
+  wires.innerHTML=""; 
+  if(!show.checked)return;
+
+  const gr=grid.getBoundingClientRect(); 
+  wires.setAttribute("width",gr.width);
+  wires.setAttribute("height",gr.height);
+  wires.setAttribute("viewBox",`0 0 ${gr.width} ${gr.height}`);
+
+  const pos=new Map(); 
+  document.querySelectorAll(".card").forEach(c=>{
+    const r=c.getBoundingClientRect();
+    pos.set(c.dataset.sigla,{
+      x:r.left-gr.left,
+      y:r.top-gr.top,
+      w:r.width,
+      h:r.height
+    });
+  });
+
+  for(const sk of sem){
+    for(const row of data.semesters[sk]){
+      const [nombre,sigla,nivel,sct,cat,pre]=row,t=pos.get(sigla);
+
+      // Oculta visualmente las líneas hacia ramos de requisito global/nivel,
+      // pero mantiene sus prerrequisitos para bloqueo y disponibilidad.
+      if(sigla === "PRACT" || sigla === "CAPS") continue;
+
+      if(!t||!pre)continue;
+
+      for(const p of pre){
+        const s=pos.get(p); 
+        if(!s)continue; 
+
+        const x1=s.x+s.w,
+              y1=s.y+s.h/2,
+              x2=t.x,
+              y2=t.y+t.h/2,
+              m=(x1+x2)/2;
+
+        const path=document.createElementNS("http://www.w3.org/2000/svg","path"); 
+        path.setAttribute("d",`M ${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`);
+        path.setAttribute("fill","none");
+        path.setAttribute("stroke",data.colors[cat]||"#22d3ee");
+        path.setAttribute("stroke-width","2");
+        path.setAttribute("opacity",".35");
+
+        path.classList.add("prereq-line");
+        path.dataset.from = p;
+        path.dataset.to = sigla;
+
+        wires.appendChild(path);
+      }
+    }
+  }
+}
+ function filter(){
+  const term=q.value.toLowerCase().trim();
+
+  document.querySelectorAll(".card").forEach(c=>{
+    const sigla=c.dataset.sigla;
+    const row=allRows(data).find(r=>r[1]===sigla);
+
+    const matchSearch=
+      !term ||
+      sigla.toLowerCase().includes(term) ||
+      c.querySelector(".name").textContent.toLowerCase().includes(term);
+
+    const projected=row?isProjected(row,data):true;
+    const isApproved=approved.has(sigla);
+
+    const matchAvailableMode=
+      !onlyAvailable.checked || (!isApproved && projected);;
+
+    c.style.display=(matchSearch && matchAvailableMode)?"block":"none";
+  });
+
+  draw();
+}
+q.oninput=filter; show.onchange=draw; lock.onchange=refreshStates; onlyAvailable.onchange=filter; window.onresize=draw; document.getElementById("reset").onclick=()=>{approved.clear();saveApproved();refreshStates();filter()};
+document.getElementById("export").onclick=()=>{exportProgress(data)};  
+document.getElementById("theme-toggle").onclick=toggleTheme;  
+refreshStates();filter();
+}
+ function exportProgress(data){
+  const rows = allRows(data);
+  const approvedRows = rows.filter(r => approved.has(r[1]));
+  const projectedRows = rows.filter(r => !approved.has(r[1]) && isProjected(r,data));
+
+  const totalSct = rows.reduce((a,r)=>a+(Number(r[3])||0),0);
+  const doneSct = approvedRows.reduce((a,r)=>a+(Number(r[3])||0),0);
+  const pctSct = totalSct ? ((doneSct/totalSct)*100).toFixed(1) : 0;
+  const pctRamos = rows.length ? ((approvedRows.length/rows.length)*100).toFixed(1) : 0;
+
+  const base = baseSemester(data);
+  const cycle = basicCycleComplete(data) ? "habilitado" : "bloqueado";
+
+  const txt = `Malla Interactiva Ingeniería Civil de Minas - DIMM UCN
+
+IMPORTANTE:
+Este reporte corresponde a una herramienta de apoyo no oficial.
+La información válida para inscripción, requisitos, avance curricular y excepciones corresponde siempre a la entregada por Jefatura de Carrera y/o los sistemas institucionales de la Universidad Católica del Norte.
+
+Resumen de avance:
+- Créditos aprobados: ${doneSct}/${totalSct} SCT (${pctSct}%)
+- Ramos aprobados: ${approvedRows.length}/${rows.length} (${pctRamos}%)
+- Semestre base estimado: ${base}
+- Proyección habilitada estimada: ${base}-${base+2}
+- Ciclo profesional: ${cycle}
+
+Ramos aprobados:
+${approvedRows.length ? approvedRows.map(r=>`- ${r[1]} | ${r[0]} | ${r[3]} SCT`).join("\n") : "- Sin ramos aprobados"}
+
+Ramos disponibles/proyectables:
+${projectedRows.length ? projectedRows.map(r=>`- ${r[1]} | ${r[0]} | Semestre ${r[2]} | ${r[3]} SCT`).join("\n") : "- Sin ramos disponibles"}
+
+Fecha de generación:
+${new Date().toLocaleString("es-CL")}
+`;
+
+  const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "avance_malla_icm_dimm_ucn.txt";
+  a.click();
+
+  URL.revokeObjectURL(url);
+} 
+ function applyTheme(){
+  const theme = localStorage.getItem("malla-theme") || "dark";
+  const btn = document.getElementById("theme-toggle");
+
+  if(theme === "light"){
+    document.body.classList.add("light-mode");
+    if(btn) btn.textContent = "🌙 Modo oscuro";
+  }else{
+    document.body.classList.remove("light-mode");
+    if(btn) btn.textContent = "☀️ Modo claro";
+  }
+}
+
+function toggleTheme(){
+  const current = localStorage.getItem("malla-theme") || "dark";
+  localStorage.setItem("malla-theme", current === "dark" ? "light" : "dark");
+  applyTheme();
+} 
+(async()=>{applyTheme();const d=await getData();buildLegend(d.colors);renderGrid(d)})();
+</script>
+</body></html>
